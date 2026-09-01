@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+/*
+ * 디자인 토큰.
+ * 레퍼런스가 확정되면 이 블록의 값만 교체하면 전체 스킨이 바뀐다.
+ */
+@theme {
+  --color-bg: #f7f7f9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f2f3f6;
+  --color-border: #e3e5ea;
+  --color-border-strong: #d2d5dd;
+
+  --color-fg: #16181d;
+  --color-fg-muted: #5c6270;
+  --color-fg-subtle: #8a909e;
+
+  --color-accent: #e0453c;
+  --color-accent-soft: #fdecea;
+
+  --color-up: #c62f2f;
+  --color-up-soft: #fdeceb;
+  --color-down: #1f5fd0;
+  --color-down-soft: #eaf1fd;
+  --color-flat: #6b7280;
+  --color-flat-soft: #f0f1f4;
+  --color-new: #6b3fd4;
+  --color-new-soft: #f1ecfd;
+
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+
+  --radius-card: 14px;
+
+  --container-content: 760px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0e0f13;
+    --color-surface: #171921;
+    --color-surface-muted: #1f222c;
+    --color-border: #2a2e3a;
+    --color-border-strong: #3a3f4d;
+
+    --color-fg: #f2f3f6;
+    --color-fg-muted: #a9afbe;
+    --color-fg-subtle: #7c8394;
+
+    --color-accent: #ff6a5e;
+    --color-accent-soft: #3a1f1d;
+
+    --color-up: #ff7b70;
+    --color-up-soft: #3a1f1d;
+    --color-down: #7aa8f5;
+    --color-down-soft: #1b2740;
+    --color-flat: #9aa1b1;
+    --color-flat-soft: #23262f;
+    --color-new: #b39bf5;
+    --color-new-soft: #241d3a;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  /* 320px 에서도 가로 스크롤이 생기지 않도록 한다. */
+  overflow-x: hidden;
+  word-break: keep-all;
+}
+
+/* 숫자 정렬 안정화 */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
