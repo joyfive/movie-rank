@@ -102,6 +102,23 @@ MovieCard → [정보 보기] → /api/movie-detail → KMDb → MovieDetail
 `netlify.toml` 에 `@netlify/plugin-nextjs` 가 설정되어 있다.
 Netlify 사이트의 Environment variables 에 위 환경변수를 등록한 뒤 배포한다.
 
+## 트러블슈팅
+
+### 화면에 "현재 박스오피스 정보를 불러오지 못했습니다" 만 보인다
+
+KOBIS 조회가 D-1 ~ D-3 모두 실패했을 때의 정상 동작이다. 원인은 서버 로그의 `[kobis]` 라인에 남는다.
+
+| 로그 | 원인 | 조치 |
+|---|---|---|
+| `[kobis] MISSING_API_KEY` | `KOBIS_API_KEY` 미설정 | 배포 환경변수에 키 등록 후 **재배포** |
+| `[kobis] KOBIS 오류 (...): 잘못된 키값입니다.` | 키가 틀림 | KOBIS 발급 키 확인 |
+| `[kobis] KOBIS 요청 실패 / HTTP 5xx` | KOBIS 장애 또는 아웃바운드 차단 | KOBIS 상태 및 호스팅 네트워크 확인 |
+| `[kobis] NO_DATA` | D-1~D-3 데이터가 모두 비어 있음 | KOBIS 데이터 갱신 대기 |
+
+- 로컬은 `.env.local`, 배포는 호스팅 대시보드의 Environment variables 에 키를 넣는다. `.env.local` 은 커밋되지 않으므로 **배포 환경에는 따로 등록해야 한다.**
+- 환경변수는 빌드 시점에 주입되므로 값을 추가한 뒤에는 재배포가 필요하다.
+- 개발 환경(`npm run dev`)에서는 오류 화면에 원인(`MISSING_API_KEY` 등)이 함께 표시된다. Production 에서는 노출되지 않는다.
+
 ## 라이선스 / Production Gate
 
 개발은 진행하되 **광고 활성화는 별도 Gate** 다. 아래 확인 전까지 다음을 유지한다.

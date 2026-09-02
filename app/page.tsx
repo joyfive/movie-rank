@@ -4,7 +4,7 @@ import Methodology from '@/components/Methodology';
 import MovieList from '@/components/MovieList';
 import SummaryStrip from '@/components/SummaryStrip';
 import { toIsoDate } from '@/lib/date';
-import { fetchLatestBoxOffice } from '@/lib/kobis';
+import { fetchLatestBoxOffice, type BoxOfficeFailure } from '@/lib/kobis';
 import { COPY, SITE } from '@/lib/site';
 import type { RankedMovie } from '@/types/movie';
 
@@ -29,25 +29,39 @@ function itemListJsonLd(movies: RankedMovie[], targetDate: string) {
   };
 }
 
-function BoxOfficeError() {
+/**
+ * Production 에서는 PRD 문구만 노출한다.
+ * 원인은 서버 로그에 남고, 개발 환경에서만 화면에도 함께 보여준다.
+ */
+function BoxOfficeError({ failure }: { failure: BoxOfficeFailure }) {
+  const showDetail = process.env.NODE_ENV !== 'production';
+
   return (
     <section className="px-4 py-16 text-center">
       <h1 className="text-xl font-bold text-fg">{COPY.heroTitle}</h1>
       <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
         {COPY.boxOfficeError}
       </p>
+
+      {showDetail ? (
+        <p className="mx-auto mt-6 max-w-md rounded-card border border-dashed border-border bg-surface-muted px-4 py-3 text-left text-xs leading-relaxed text-fg-subtle">
+          <span className="font-bold">[개발 전용] {failure.reason}</span>
+          <br />
+          {failure.detail}
+        </p>
+      ) : null}
     </section>
   );
 }
 
 export default async function HomePage() {
-  const snapshot = await fetchLatestBoxOffice();
+  const result = await fetchLatestBoxOffice();
 
-  if (!snapshot) {
-    return <BoxOfficeError />;
+  if (result.status === 'FAILED') {
+    return <BoxOfficeError failure={result.failure} />;
   }
 
-  const { targetDate, movies } = snapshot;
+  const { targetDate, movies } = result.snapshot;
 
   return (
     <>

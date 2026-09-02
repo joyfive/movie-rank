@@ -42,6 +42,7 @@ beforeEach(() => {
   fetchMock = vi.fn();
   vi.stubGlobal('fetch', fetchMock);
   vi.spyOn(console, 'error').mockImplementation(() => {});
+  vi.spyOn(console, 'warn').mockImplementation(() => {});
 });
 
 afterEach(() => {
@@ -141,11 +142,13 @@ describe('fetchLatestBoxOffice', () => {
       .mockResolvedValueOnce(jsonResponse(okPayload([])))
       .mockResolvedValueOnce(jsonResponse(okPayload([rawMovie()])));
 
-    const snapshot = await fetchLatestBoxOffice(BASE_DATE);
+    const result = await fetchLatestBoxOffice(BASE_DATE);
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(snapshot?.targetDate).toBe('20260830');
-    expect(snapshot?.movies).toHaveLength(1);
+    expect(result.status).toBe('OK');
+    if (result.status !== 'OK') return;
+    expect(result.snapshot.targetDate).toBe('20260830');
+    expect(result.snapshot.movies).toHaveLength(1);
   });
 
   it('D-1 실패 후 D-2 로 넘어간다', async () => {
@@ -153,23 +156,45 @@ describe('fetchLatestBoxOffice', () => {
       .mockRejectedValueOnce(new Error('network'))
       .mockResolvedValueOnce(jsonResponse(okPayload([rawMovie()])));
 
-    const snapshot = await fetchLatestBoxOffice(BASE_DATE);
-    expect(snapshot?.targetDate).toBe('20260830');
+    const result = await fetchLatestBoxOffice(BASE_DATE);
+
+    expect(result.status).toBe('OK');
+    if (result.status !== 'OK') return;
+    expect(result.snapshot.targetDate).toBe('20260830');
   });
 
-  it('D-1~D-3 이 모두 비면 null 을 반환한다', async () => {
-    fetchMock.mockResolvedValue(jsonResponse(okPayload([])));
+  it('D-1~D-3 이 모두 비면 NO_DATA 로 실패한다', async () => {
+    // 3회 조회마다 새 Response 를 만든다 (body 는 한 번만 읽을 수 있다).
+    fetchMock.mockImplementation(async () => jsonResponse(okPayload([])));
 
-    const snapshot = await fetchLatestBoxOffice(BASE_DATE);
+    const result = await fetchLatestBoxOffice(BASE_DATE);
 
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    expect(snapshot).toBeNull();
+    expect(result).toEqual({
+      status: 'FAILED',
+      failure: { reason: 'NO_DATA', detail: expect.stringContaining('20260831') },
+    });
   });
 
-  it('최대 3일까지만 조회한다', async () => {
+  it('최대 3일까지만 조회하고 API_ERROR 로 실패한다', async () => {
     fetchMock.mockRejectedValue(new Error('down'));
 
-    expect(await fetchLatestBoxOffice(BASE_DATE)).toBeNull();
+    const result = await fetchLatestBoxOffice(BASE_DATE);
+
     expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(result.status).toBe('FAILED');
+    if (result.status !== 'FAILED') return;
+    expect(result.failure.reason).toBe('API_ERROR');
+  });
+
+  it('API key 가 없으면 호출 없이 MISSING_API_KEY 로 즉시 실패한다', async () => {
+    delete process.env.KOBIS_API_KEY;
+
+    const result = await fetchLatestBoxOffice(BASE_DATE);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result.status).toBe('FAILED');
+    if (result.status !== 'FAILED') return;
+    expect(result.failure.reason).toBe('MISSING_API_KEY');
   });
 });
