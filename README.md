@@ -49,7 +49,7 @@ npm test           # Vitest
 |---|---|
 | `KOBIS_API_KEY` | KOBIS OpenAPI key. **server-only** |
 | `KMDB_API_KEY` | KMDb OpenAPI ServiceKey. **server-only** |
-| `NEXT_PUBLIC_SITE_URL` | canonical / sitemap / OG 기준 URL |
+| `NEXT_PUBLIC_SITE_URL` | canonical / sitemap / OG 기준 URL. 비워두면 Netlify `URL` / `DEPLOY_PRIME_URL`, Vercel `VERCEL_URL` 순으로 폴백한다 |
 | `NEXT_PUBLIC_ADSENSE_ENABLED` | `true` 일 때만 실제 광고 코드 렌더링 (기본 `false`) |
 | `NEXT_PUBLIC_ADSENSE_CLIENT` | AdSense `ca-pub-...` |
 | `NEXT_PUBLIC_ADSENSE_SLOT_A` / `_B` | 광고 슬롯 ID |
