@@ -24,7 +24,12 @@ export type MovieDetailOutcome =
   | { status: 'OK'; detail: MovieDetail }
   | { status: 'MATCH_FAILED'; reason: MatchFailureReason };
 
-const posterEnabled = () => process.env.NEXT_PUBLIC_POSTER_ENABLED === 'true';
+/**
+ * 포스터 노출 여부.
+ * 이 값은 브라우저에 필요 없으므로 NEXT_PUBLIC_ 접두사를 쓰지 않는다.
+ * 서버에서만 읽히며, 덕분에 재빌드 없이 런타임에 켜고 끌 수 있다.
+ */
+const posterEnabled = () => process.env.POSTER_ENABLED === 'true';
 
 function pickPlot(item: KmdbResultItem): string | null {
   const plots = item.plots?.plot ?? [];

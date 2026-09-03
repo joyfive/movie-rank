@@ -65,7 +65,7 @@ export default async function HomePage() {
   const { targetDate, movies } = result.snapshot;
 
   // 포스터는 목록에 노출되므로 SSR 시점에 함께 조회한다.
-  // NEXT_PUBLIC_POSTER_ENABLED=false 이면 KMDb 를 호출하지 않고 빈 객체를 받는다.
+  // POSTER_ENABLED=false 이면 KMDb 를 호출하지 않고 빈 객체를 받는다.
   const posters = await fetchPosters(
     movies.map((movie) => ({
       movieCode: movie.movieCode,
