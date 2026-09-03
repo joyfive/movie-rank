@@ -2,7 +2,7 @@ import AdSlot from '@/components/AdSlot';
 import Hero from '@/components/Hero';
 import Methodology from '@/components/Methodology';
 import BoxOfficeGallery from '@/components/BoxOfficeGallery';
-import SummaryStrip from '@/components/SummaryStrip';
+import SummaryStrip, { pickTopMovie } from '@/components/SummaryStrip';
 import { toIsoDate } from '@/lib/date';
 import { fetchPosters } from '@/lib/kmdb';
 import { fetchLatestBoxOffice, type BoxOfficeFailure } from '@/lib/kobis';
@@ -74,6 +74,9 @@ export default async function HomePage() {
     })),
   );
 
+  // 히어로는 1위를 다룬다. KOBIS 응답 순서에 의존하지 않고 rank 로 고른다.
+  const top = pickTopMovie(movies);
+
   return (
     <>
       <script
@@ -82,8 +85,10 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd(movies, targetDate)) }}
       />
 
-      <Hero targetDate={targetDate} />
-      <SummaryStrip movies={movies} />
+      {top ? (
+        <Hero targetDate={targetDate} top={top} posterUrl={posters[top.movieCode] ?? null} />
+      ) : null}
+      <SummaryStrip movies={movies} posters={posters} />
 
       <div className="py-4 lg:py-6">
         <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_A} label="광고 영역 A" minHeight={100} />
@@ -92,6 +97,7 @@ export default async function HomePage() {
       <BoxOfficeGallery
         movies={movies}
         posters={posters}
+        targetDate={targetDate}
         adSlot={
           <AdSlot
             slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_B}
