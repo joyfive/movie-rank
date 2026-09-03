@@ -10,18 +10,20 @@ interface HeatScoreProps {
 export default function HeatScore({ score, label }: HeatScoreProps) {
   return (
     <div className="shrink-0 text-right">
-      <div className="flex items-baseline justify-end gap-1">
-        <span className="text-xs font-medium text-fg-subtle">흥행 온도</span>
-        <span className="tabular text-2xl font-extrabold text-accent">{formatHeat(score)}</span>
+      <div className="font-display tabular text-4xl leading-none text-accent-text">
+        {formatHeat(score)}
       </div>
-      <div className="mt-0.5 text-xs font-semibold text-fg-muted">{label}</div>
+      <div className="mt-1 text-[0.7rem] font-semibold tracking-wide text-fg-muted">{label}</div>
 
       <div
-        className="mt-1.5 h-1 w-20 overflow-hidden rounded-full bg-surface-muted"
+        className="mt-2 h-[3px] w-20 overflow-hidden rounded-full bg-surface-muted"
         role="img"
         aria-label={`흥행 온도 100점 만점에 ${score}점, ${label}`}
       >
-        <div className="h-full rounded-full bg-accent" style={{ width: `${score}%` }} />
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-accent to-new"
+          style={{ width: `${score}%` }}
+        />
       </div>
     </div>
   );

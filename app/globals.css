@@ -1,64 +1,81 @@
 @import "tailwindcss";
 
-/*
- * 디자인 토큰.
- * 레퍼런스가 확정되면 이 블록의 값만 교체하면 전체 스킨이 바뀐다.
- */
+/* ---------------------------------------------------------------------------
+ * 폰트
+ * 타이틀: 양진체 (Yangjin) — 단일 weight. 합성 bold 를 쓰지 않는다.
+ * 본문:   SUIT — 300 / 400 / 600
+ * ------------------------------------------------------------------------ */
+@font-face {
+  font-family: 'Yangjin';
+  src: url('https://cdn.jsdelivr.net/gh/supernovice-lab/font@0.9/yangjin.woff') format('woff');
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suit';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suit';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suit';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------------
+ * 디자인 토큰
+ * 레퍼런스 기준: 다크 배경 + 강한 레드 액센트 + 대형 디스플레이 타이포.
+ * 포스터가 OFF 인 상태에서도 성립하도록 타이포와 색으로 위계를 만든다.
+ * ------------------------------------------------------------------------ */
 @theme {
-  --color-bg: #f7f7f9;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f2f3f6;
-  --color-border: #e3e5ea;
-  --color-border-strong: #d2d5dd;
+  --color-bg: #08080a;
+  --color-surface: #121216;
+  --color-surface-2: #1a1a20;
+  --color-surface-muted: #212129;
+  --color-border: #2a2a33;
+  --color-border-strong: #3d3d48;
 
-  --color-fg: #16181d;
-  --color-fg-muted: #5c6270;
-  --color-fg-subtle: #8a909e;
+  --color-fg: #f4f4f6;
+  --color-fg-muted: #a3a3ad;
+  --color-fg-subtle: #6d6d79;
 
-  --color-accent: #e0453c;
-  --color-accent-soft: #fdecea;
+  /* 채움용 레드 (막대·배경). 작은 글자에는 accent-text 를 쓴다. */
+  --color-accent: #e50914;
+  --color-accent-text: #ff4b55;
+  --color-accent-soft: #2a0d10;
 
-  --color-up: #c62f2f;
-  --color-up-soft: #fdeceb;
-  --color-down: #1f5fd0;
-  --color-down-soft: #eaf1fd;
-  --color-flat: #6b7280;
-  --color-flat-soft: #f0f1f4;
-  --color-new: #6b3fd4;
-  --color-new-soft: #f1ecfd;
+  /* 상승은 레드, 하락은 블루, 신규는 골드. 기호를 함께 노출해 색에만 의존하지 않는다. */
+  --color-up: #ff4b55;
+  --color-up-soft: #2a0d10;
+  --color-down: #5aa2ff;
+  --color-down-soft: #0d1a2a;
+  --color-flat: #8d8d99;
+  --color-flat-soft: #1e1e25;
+  --color-new: #ffc53d;
+  --color-new-soft: #2a2110;
 
-  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --font-sans: 'Suit', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+    'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  --font-display: 'Yangjin', 'Suit', -apple-system, 'Apple SD Gothic Neo',
+    'Noto Sans KR', system-ui, sans-serif;
 
-  --radius-card: 14px;
-
+  --radius-card: 12px;
   --container-content: 760px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #0e0f13;
-    --color-surface: #171921;
-    --color-surface-muted: #1f222c;
-    --color-border: #2a2e3a;
-    --color-border-strong: #3a3f4d;
-
-    --color-fg: #f2f3f6;
-    --color-fg-muted: #a9afbe;
-    --color-fg-subtle: #7c8394;
-
-    --color-accent: #ff6a5e;
-    --color-accent-soft: #3a1f1d;
-
-    --color-up: #ff7b70;
-    --color-up-soft: #3a1f1d;
-    --color-down: #7aa8f5;
-    --color-down-soft: #1b2740;
-    --color-flat: #9aa1b1;
-    --color-flat-soft: #23262f;
-    --color-new: #b39bf5;
-    --color-new-soft: #241d3a;
-  }
+:root {
+  color-scheme: dark;
 }
 
 html {
@@ -72,6 +89,16 @@ body {
   /* 320px 에서도 가로 스크롤이 생기지 않도록 한다. */
   overflow-x: hidden;
   word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * 양진체는 weight 가 하나뿐이다. 합성 bold 가 붙지 않도록 강제한다.
+ */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: normal;
+  letter-spacing: -0.01em;
 }
 
 /* 숫자 정렬 안정화 */
@@ -80,7 +107,12 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-accent-text);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
 }

@@ -25,12 +25,12 @@ export function countNewEntries(movies: RankedMovie[]): number {
 
 function Cell({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="min-w-0 flex-1 px-3 py-3 text-center">
-      <div className="text-xs font-medium text-fg-subtle">{label}</div>
-      <div className="mt-1 truncate text-sm font-bold text-fg" title={value}>
+    <div className="min-w-0 flex-1 px-2.5 py-3.5 text-center">
+      <div className="text-[0.68rem] tracking-wide text-fg-subtle">{label}</div>
+      <div className="font-display mt-1.5 truncate text-sm text-fg" title={value}>
         {value}
       </div>
-      {sub ? <div className="tabular mt-0.5 text-xs text-fg-muted">{sub}</div> : null}
+      {sub ? <div className="tabular mt-1 text-[0.7rem] text-accent-text">{sub}</div> : null}
     </div>
   );
 }

@@ -38,7 +38,7 @@ function BoxOfficeError({ failure }: { failure: BoxOfficeFailure }) {
 
   return (
     <section className="px-4 py-16 text-center">
-      <h1 className="text-xl font-bold text-fg">{COPY.heroTitle}</h1>
+      <h1 className="font-display text-2xl text-fg">{COPY.heroTitle}</h1>
       <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
         {COPY.boxOfficeError}
       </p>

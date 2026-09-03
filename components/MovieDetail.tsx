@@ -88,10 +88,10 @@ export default function MovieDetail({ movie }: { movie: RankedMovie }) {
   }, []);
 
   return (
-    <div className="border-t border-border bg-surface-muted px-4 py-4 text-sm">
+    <div className="border-t border-border bg-surface-2 px-4 py-4 text-sm">
       <div className="mb-2 flex items-baseline justify-between gap-2">
-        <h4 className="text-xs font-bold tracking-wide text-fg-muted">영화 정보</h4>
-        <span className="text-xs text-fg-subtle">출처 KMDb</span>
+        <h4 className="text-[0.68rem] tracking-widest text-fg-subtle uppercase">Movie Info</h4>
+        <span className="text-[0.68rem] text-fg-subtle">출처 KMDb</span>
       </div>
 
       {state.kind === 'loading' ? (
@@ -110,7 +110,7 @@ export default function MovieDetail({ movie }: { movie: RankedMovie }) {
           <button
             type="button"
             onClick={retry}
-            className="mt-2 rounded-md border border-border-strong bg-surface px-3 py-1.5 text-xs font-semibold text-fg hover:bg-surface-muted"
+            className="mt-2 rounded-md border border-border-strong bg-surface px-3 py-1.5 text-xs font-semibold text-fg hover:border-accent hover:text-accent-text"
           >
             다시 시도
           </button>

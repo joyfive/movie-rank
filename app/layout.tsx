@@ -39,16 +39,15 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f7f7f9' },
-    { media: '(prefers-color-scheme: dark)', color: '#0e0f13' },
-  ],
+  themeColor: '#08080a',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
       <body className="min-h-dvh">
+        {/* 폰트 CDN. React 19 가 head 로 hoist 한다. */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
         <Header />
         <main className="mx-auto max-w-content">{children}</main>
         <Footer />

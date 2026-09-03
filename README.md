@@ -20,6 +20,21 @@
 | Hosting | Netlify |
 | DB | 없음 |
 
+## 디자인
+
+다크 테마 고정(`color-scheme: dark`). 포스터가 OFF 인 상태에서도 성립하도록 **대형 순위 숫자와 흥행 온도**가 시각적 앵커 역할을 한다.
+
+| 항목 | 값 |
+|---|---|
+| 타이틀 | 양진체 (Yangjin) — 단일 weight, `.font-display` |
+| 본문 | SUIT — 300 / 400 / 600 |
+| 액센트 | `#e50914` (채움) / `#ff4b55` (텍스트) |
+| 상태색 | 상승 레드 · 하락 블루 · 신규 골드 · 유지 그레이 (기호 병기) |
+
+폰트는 `app/globals.css` 의 `@font-face` 에서 jsDelivr CDN 으로 불러오며 `font-display: swap` 이다.
+색·간격·라운드는 모두 같은 파일의 `@theme` 토큰에 있으므로 스킨 변경은 이 블록만 수정하면 된다.
+양진체는 weight 가 하나뿐이라 합성 bold 가 붙지 않도록 `.font-display` 에서 `font-weight: normal` 을 강제한다.
+
 ## 시작하기
 
 ```bash
