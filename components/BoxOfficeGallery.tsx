@@ -85,7 +85,7 @@ export default function BoxOfficeGallery({ movies, posters, adSlot }: BoxOfficeG
 
   return (
     <section aria-label="박스오피스 TOP 10">
-      <div className="px-4">
+      <div className="gutter">
         {movies.map((movie, index) => (
           <MovieStage
             key={movie.movieCode || movie.rank}
@@ -98,9 +98,9 @@ export default function BoxOfficeGallery({ movies, posters, adSlot }: BoxOfficeG
         ))}
       </div>
 
-      <div className="mt-8">
-        <div className="flex items-baseline justify-between px-4">
-          <h2 className="font-display text-sm text-fg">
+      <div className="mt-8 lg:mt-14">
+        <div className="gutter flex items-baseline justify-between">
+          <h2 className="font-display text-sm text-fg lg:text-lg">
             TOP 10 <span className="text-fg-subtle">1–5위</span>
           </h2>
           <p className="text-[0.68rem] text-fg-subtle">포스터를 눌러 자세히 보기</p>
@@ -113,7 +113,7 @@ export default function BoxOfficeGallery({ movies, posters, adSlot }: BoxOfficeG
         <>
           <div className="my-5">{adSlot}</div>
 
-          <h2 className="font-display px-4 text-sm text-fg">
+          <h2 className="font-display gutter text-sm text-fg lg:text-lg">
             TOP 10 <span className="text-fg-subtle">6–10위</span>
           </h2>
           <Rail label="6위부터 10위까지">{tail.map((movie, index) => renderTile(movie, index + 5))}</Rail>
@@ -123,14 +123,17 @@ export default function BoxOfficeGallery({ movies, posters, adSlot }: BoxOfficeG
   );
 }
 
-/** 가로 레일. 페이지가 아니라 레일 안에서만 스크롤한다. */
+/**
+ * 포스터 레일.
+ * 모바일은 레일 안에서만 가로 스크롤하고, PC 는 5열 그리드로 폭을 채운다.
+ */
 function Rail({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div
       role="tablist"
       aria-label={label}
       aria-orientation="horizontal"
-      className="mt-2.5 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="gutter mt-2.5 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 lg:mt-4 lg:grid lg:grid-cols-5 lg:gap-5 lg:overflow-visible [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {children}
     </div>

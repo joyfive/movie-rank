@@ -4,7 +4,7 @@ import { SITE } from '@/lib/site';
 export default function Footer() {
   return (
     <footer className="mt-6 border-t border-border bg-surface">
-      <div className="mx-auto max-w-content px-4 py-8 text-xs leading-relaxed text-fg-subtle">
+      <div className="gutter py-8 text-xs leading-relaxed text-fg-subtle">
         <p className="font-display text-base text-accent-text">
           {SITE.wordmark}{' '}
           <span className="text-xs text-fg-subtle">{SITE.wordmarkKo}</span>

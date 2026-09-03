@@ -10,7 +10,7 @@ const BANDS = [
 
 export default function Methodology() {
   return (
-    <section className="px-4 py-8" aria-labelledby="methodology-title">
+    <section className="gutter py-8 lg:py-14" aria-labelledby="methodology-title">
       <div className="rounded-card border border-border bg-surface p-5">
         <h2 id="methodology-title" className="font-display text-lg text-fg">
           {COPY.methodologyTitle}

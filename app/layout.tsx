@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* 폰트 CDN. React 19 가 head 로 hoist 한다. */}
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
         <Header />
-        <main className="mx-auto max-w-content">{children}</main>
+        <main>{children}</main>
         <Footer />
         <Analytics />
         <AdSenseScript />

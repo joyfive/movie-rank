@@ -7,11 +7,11 @@ interface HeroProps {
 
 export default function Hero({ targetDate }: HeroProps) {
   return (
-    <section className="relative overflow-hidden px-4 pt-9 pb-7">
+    <section className="gutter relative overflow-hidden pt-9 pb-7 lg:pt-16 lg:pb-10">
       {/* 레드 글로우. 포스터 없이도 화면 상단에 무게를 준다. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 -left-28 h-72 w-72 rounded-full bg-accent opacity-[0.07] blur-3xl"
+        className="pointer-events-none absolute -top-40 -left-28 h-72 w-72 rounded-full bg-accent opacity-[0.07] blur-3xl lg:h-[32rem] lg:w-[32rem]"
       />
 
       <div className="relative">
@@ -20,13 +20,13 @@ export default function Hero({ targetDate }: HeroProps) {
           Daily Box Office
         </p>
 
-        <h1 className="font-display text-[2.1rem] leading-[1.15] text-fg sm:text-5xl">
+        <h1 className="font-display text-[2.1rem] leading-[1.12] text-fg sm:text-5xl lg:text-6xl xl:text-7xl">
           오늘 극장가,
           <br />
           <span className="text-accent-text">뭐가 뜨고</span> 있을까?
         </h1>
 
-        <p className="mt-5 text-sm text-fg-muted">
+        <p className="mt-5 text-sm text-fg-muted lg:text-base">
           <time dateTime={toIsoDate(targetDate)} className="tabular font-semibold text-fg">
             {formatTargetDate(targetDate)}
           </time>{' '}

@@ -10,11 +10,16 @@ import { formatOpenDate } from '@/lib/date';
 import { formatAudience, formatPercent, formatRankDelta } from '@/lib/format';
 import type { RankedMovie } from '@/types/movie';
 
+/**
+ * 통계 한 줄.
+ * 모바일은 좌우 정렬 행, PC 는 라벨 위 / 값 아래의 블록이 된다.
+ * 풀폭에서 값이 화면 끝까지 늘어지지 않도록 하기 위함이다.
+ */
 function Row({ label, value, srValue }: { label: string; value: string; srValue?: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-border/70 py-1.5">
-      <dt className="shrink-0 text-fg-subtle">{label}</dt>
-      <dd className="tabular min-w-0 text-right font-semibold text-fg">
+    <div className="flex items-baseline justify-between gap-3 border-b border-border/70 py-1.5 lg:flex-col lg:items-start lg:gap-1 lg:border-b-0 lg:border-l lg:border-border lg:py-0 lg:pl-3">
+      <dt className="shrink-0 text-fg-subtle lg:text-xs">{label}</dt>
+      <dd className="tabular min-w-0 text-right font-semibold text-fg lg:text-left lg:text-lg">
         {value}
         {srValue ? <span className="sr-only"> {srValue}</span> : null}
       </dd>
@@ -55,77 +60,75 @@ export default function MovieStage({
 
   return (
     <div role="tabpanel" id={panelId} aria-labelledby={tabId} hidden={hidden}>
-      <div className="relative pb-7">
-        {/* 순위를 배경 고스트 숫자로 크게 깐다. 포스터가 그 위에 겹친다. */}
+      <div className="stage relative">
+        {/* 순위를 고스트 숫자로 크게 깐다. 포스터와 텍스트가 그 위에 얹힌다. */}
         <span
           aria-hidden="true"
-          className="font-display tabular pointer-events-none absolute right-0 bottom-2 z-0 text-[6.5rem] leading-[0.8] text-surface-muted select-none sm:text-[10rem]"
+          className="font-display tabular pointer-events-none absolute right-0 bottom-2 z-0 text-[6.5rem] leading-[0.8] text-surface-muted select-none sm:text-[10rem] lg:top-0 lg:bottom-auto lg:text-[16rem]"
         >
           {String(movie.rank).padStart(2, '0')}
         </span>
 
-        <div className="relative z-10 flex gap-4 sm:gap-6">
-          <div className="relative w-[42%] max-w-[200px] min-w-[112px] shrink-0">
-            <Poster
-              src={posterUrl}
-              alt={`${movie.title} 포스터`}
-              rank={movie.rank}
-              priority={movie.rank === 1}
-              className="w-full shadow-[0_8px_28px_rgba(16,16,20,0.16)]"
-            />
-            <div className="absolute -right-4 -bottom-5 sm:-right-6">
-              <HeatBadge score={movie.heatScore} label={movie.heatLabel} />
-            </div>
-          </div>
-
-          <div className="flex min-w-0 flex-1 flex-col pt-1">
-            <div className="flex items-center gap-2">
-              <span className="tabular bg-accent px-1.5 py-0.5 text-[0.7rem] font-semibold text-white">
-                {movie.rank}위
-              </span>
-              <StatusBadge status={movie.status} />
-            </div>
-
-            <h2 className="font-display mt-2.5 text-[1.6rem] leading-[1.1] text-fg sm:text-4xl">
-              {movie.title}
-            </h2>
-
-            <p className="mt-2 text-xs font-semibold text-fg-muted">
-              {movie.heatLabel}
-              {openDate ? <span className="text-fg-subtle"> · {openDate} 개봉</span> : null}
-            </p>
+        <div className="stage-poster relative z-10 mb-7">
+          <Poster
+            src={posterUrl}
+            alt={`${movie.title} 포스터`}
+            rank={movie.rank}
+            priority={movie.rank === 1}
+            className="w-full shadow-[0_8px_28px_rgba(16,16,20,0.16)]"
+          />
+          <div className="absolute -right-4 -bottom-5 sm:-right-6 lg:-right-7">
+            <HeatBadge score={movie.heatScore} label={movie.heatLabel} />
           </div>
         </div>
-      </div>
 
-      <dl className="mt-4 text-[0.85rem]">
-        <Row label="순위 변화" value={delta.text} srValue={delta.label} />
-        <Row label="어제 관객" value={formatAudience(movie.audienceToday)} />
-        <Row label="누적 관객" value={formatAudience(movie.audienceTotal)} />
-        <Row label="관객 변화" value={formatPercent(movie.audienceChange)} />
-      </dl>
-
-      <p className="mt-2 text-[0.68rem] text-fg-subtle">출처 KOBIS</p>
-
-      <div className="mt-4">
-        <button
-          type="button"
-          onClick={toggle}
-          aria-expanded={open}
-          aria-controls={detailId}
-          className="w-full rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto sm:min-w-[220px]"
-        >
-          {open ? '영화 정보 닫기' : '영화 정보 보기'}
-          <span className="sr-only"> — {movie.title}</span>
-        </button>
-      </div>
-
-      <div id={detailId} hidden={!open} className="mt-4">
-        {open ? (
-          <div className="overflow-hidden rounded-card border border-border">
-            <MovieDetail movie={movie} />
+        <div className="stage-title relative z-10 min-w-0 pt-1">
+          <div className="flex items-center gap-2">
+            <span className="tabular bg-accent px-1.5 py-0.5 text-[0.7rem] font-semibold text-white">
+              {movie.rank}위
+            </span>
+            <StatusBadge status={movie.status} />
           </div>
-        ) : null}
+
+          <h2 className="font-display mt-2.5 text-[1.6rem] leading-[1.1] text-fg sm:text-4xl lg:text-6xl">
+            {movie.title}
+          </h2>
+
+          <p className="mt-2 text-xs font-semibold text-fg-muted lg:mt-4 lg:text-sm">
+            {movie.heatLabel}
+            {openDate ? <span className="text-fg-subtle"> · {openDate} 개봉</span> : null}
+          </p>
+        </div>
+
+        <dl className="stage-stats relative z-10 mt-4 text-[0.85rem] lg:mt-9 lg:grid lg:max-w-3xl lg:grid-cols-4 lg:gap-x-6">
+          <Row label="순위 변화" value={delta.text} srValue={delta.label} />
+          <Row label="어제 관객" value={formatAudience(movie.audienceToday)} />
+          <Row label="누적 관객" value={formatAudience(movie.audienceTotal)} />
+          <Row label="관객 변화" value={formatPercent(movie.audienceChange)} />
+        </dl>
+
+        <div className="stage-cta relative z-10">
+          <p className="mt-2 text-[0.68rem] text-fg-subtle">출처 KOBIS</p>
+
+          <button
+            type="button"
+            onClick={toggle}
+            aria-expanded={open}
+            aria-controls={detailId}
+            className="mt-4 w-full rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto sm:min-w-[220px]"
+          >
+            {open ? '영화 정보 닫기' : '영화 정보 보기'}
+            <span className="sr-only"> — {movie.title}</span>
+          </button>
+
+          <div id={detailId} hidden={!open} className="mt-4 lg:max-w-3xl">
+            {open ? (
+              <div className="overflow-hidden rounded-card border border-border">
+                <MovieDetail movie={movie} />
+              </div>
+            ) : null}
+          </div>
+        </div>
       </div>
     </div>
   );

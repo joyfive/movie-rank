@@ -15,7 +15,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <section className="px-4 py-16 text-center">
+    <section className="gutter py-16 text-center">
       <h1 className="font-display text-2xl text-fg">잠시 문제가 발생했습니다</h1>
       <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
         {COPY.boxOfficeError}

@@ -38,7 +38,7 @@ function BoxOfficeError({ failure }: { failure: BoxOfficeFailure }) {
   const showDetail = process.env.NODE_ENV !== 'production';
 
   return (
-    <section className="px-4 py-16 text-center">
+    <section className="gutter py-16 text-center">
       <h1 className="font-display text-2xl text-fg">{COPY.heroTitle}</h1>
       <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
         {COPY.boxOfficeError}
@@ -85,7 +85,7 @@ export default async function HomePage() {
       <Hero targetDate={targetDate} />
       <SummaryStrip movies={movies} />
 
-      <div className="py-4">
+      <div className="py-4 lg:py-6">
         <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_A} label="광고 영역 A" minHeight={100} />
       </div>
 

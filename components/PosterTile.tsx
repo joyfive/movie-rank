@@ -41,7 +41,7 @@ export default function PosterTile({
       tabIndex={selected ? 0 : -1}
       onClick={onSelect}
       onKeyDown={onKeyDown}
-      className="group relative w-[96px] shrink-0 snap-start pt-3 pb-2 text-left sm:w-[116px]"
+      className="group relative w-[96px] shrink-0 snap-start pt-3 pb-2 text-left sm:w-[124px] lg:w-auto"
     >
       {/* 선택된 한 장의 뒤를 레드 블록이 받친다. */}
       <span
@@ -65,7 +65,7 @@ export default function PosterTile({
 
       <div className="mt-2 px-1.5">
         <p
-          className={`tabular text-[0.7rem] leading-none font-semibold ${
+          className={`tabular text-[0.7rem] leading-none font-semibold lg:text-xs ${
             selected ? 'text-white' : 'text-accent-text'
           }`}
         >
@@ -77,7 +77,7 @@ export default function PosterTile({
           </span>
         </p>
         <p
-          className={`mt-1 line-clamp-2 text-[0.72rem] leading-snug ${
+          className={`mt-1 line-clamp-2 text-[0.72rem] leading-snug lg:text-sm ${
             selected ? 'text-white' : 'text-fg-muted'
           }`}
         >

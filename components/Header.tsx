@@ -4,7 +4,7 @@ import { SITE } from '@/lib/site';
 export default function Header() {
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-surface/90 backdrop-blur">
-      <div className="mx-auto flex max-w-content items-center gap-2 px-4 py-3.5">
+      <div className="gutter flex items-center gap-2 py-3.5">
         <span className="font-display text-xl leading-none tracking-tight text-accent-text">
           {SITE.wordmark}
         </span>
