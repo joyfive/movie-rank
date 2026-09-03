@@ -25,12 +25,12 @@ export function countNewEntries(movies: RankedMovie[]): number {
 
 function Cell({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="min-w-0 flex-1 px-3 py-3 text-center">
-      <div className="text-xs font-medium text-fg-subtle">{label}</div>
-      <div className="mt-1 truncate text-sm font-bold text-fg" title={value}>
+    <div className="min-w-0 flex-1 px-2.5 py-3.5 text-center lg:py-5">
+      <div className="text-[0.68rem] tracking-wide text-fg-subtle lg:text-sm">{label}</div>
+      <div className="font-display mt-1.5 truncate text-sm text-fg lg:text-xl" title={value}>
         {value}
       </div>
-      {sub ? <div className="tabular mt-0.5 text-xs text-fg-muted">{sub}</div> : null}
+      {sub ? <div className="tabular mt-1 text-[0.7rem] text-accent-text">{sub}</div> : null}
     </div>
   );
 }
@@ -43,7 +43,7 @@ export default function SummaryStrip({ movies }: { movies: RankedMovie[] }) {
   if (!top) return null;
 
   return (
-    <section aria-label="오늘의 요약" className="px-4">
+    <section aria-label="오늘의 요약" className="gutter">
       <div className="flex divide-x divide-border rounded-card border border-border bg-surface">
         <Cell label="오늘 1위" value={top.title} sub={formatHeat(top.heatScore)} />
         <Cell

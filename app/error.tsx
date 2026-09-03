@@ -15,15 +15,15 @@ export default function Error({
   }, [error]);
 
   return (
-    <section className="px-4 py-16 text-center">
-      <h1 className="text-xl font-bold text-fg">잠시 문제가 발생했습니다</h1>
+    <section className="gutter py-16 text-center">
+      <h1 className="font-display text-2xl text-fg">잠시 문제가 발생했습니다</h1>
       <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
         {COPY.boxOfficeError}
       </p>
       <button
         type="button"
         onClick={reset}
-        className="mt-6 rounded-md border border-border-strong bg-surface px-4 py-2 text-sm font-semibold text-fg hover:bg-surface-muted"
+        className="mt-6 rounded-md border border-border-strong bg-surface px-4 py-2 text-sm font-semibold text-fg hover:border-accent hover:text-accent-text"
       >
         다시 시도
       </button>

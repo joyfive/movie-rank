@@ -110,26 +110,57 @@ export async function fetchDailyBoxOffice(targetDt: string): Promise<RankedMovie
   return list.map(toRankedMovie);
 }
 
+export type BoxOfficeFailureReason = 'MISSING_API_KEY' | 'NO_DATA' | 'API_ERROR';
+
+export interface BoxOfficeFailure {
+  reason: BoxOfficeFailureReason;
+  /** 서버 로그 및 개발 환경 화면에만 노출한다. 사용자에게는 PRD 문구만 보여준다. */
+  detail: string;
+}
+
+export type BoxOfficeResult =
+  | { status: 'OK'; snapshot: BoxOfficeSnapshot }
+  | { status: 'FAILED'; failure: BoxOfficeFailure };
+
 /**
  * 최신 가용 박스오피스를 조회한다.
- * D-1 → D-2 → D-3 순으로 시도하며, 세 번 모두 비어 있거나 실패하면 null을 반환한다.
- * Production에서 오래된 mock 데이터로 대체하지 않는다.
+ * D-1 → D-2 → D-3 순으로 시도하며 최대 3일까지만 내려간다.
+ * Production 에서 오래된 mock 데이터로 대체하지 않는다.
+ *
+ * 실패 시 사용자에게는 단일 문구만 보여주되, 원인을 구분해 서버 로그에 남긴다.
  */
-export async function fetchLatestBoxOffice(
-  base: Date = new Date(),
-): Promise<BoxOfficeSnapshot | null> {
+export async function fetchLatestBoxOffice(base: Date = new Date()): Promise<BoxOfficeResult> {
+  // 키가 없으면 3일치를 헛돌 이유가 없다. 배포 환경변수 누락을 즉시 드러낸다.
+  if (!process.env.KOBIS_API_KEY) {
+    const detail = 'KOBIS_API_KEY 환경변수가 설정되지 않았습니다. 배포 환경변수를 확인하세요.';
+    console.error('[kobis] MISSING_API_KEY:', detail);
+    return { status: 'FAILED', failure: { reason: 'MISSING_API_KEY', detail } };
+  }
+
   const candidates = getTargetDateCandidates(base);
+  const errors: string[] = [];
 
   for (const targetDate of candidates) {
     try {
       const movies = await fetchDailyBoxOffice(targetDate);
       if (movies.length > 0) {
-        return { targetDate, movies };
+        return { status: 'OK', snapshot: { targetDate, movies } };
       }
+      console.warn(`[kobis] ${targetDate} 데이터가 비어 있어 이전 날짜로 넘어갑니다.`);
     } catch (error) {
-      console.error('[kobis]', (error as Error).message);
+      const message = (error as Error).message;
+      errors.push(message);
+      console.error('[kobis]', message);
     }
   }
 
-  return null;
+  if (errors.length > 0) {
+    const detail = errors.join(' / ');
+    console.error(`[kobis] API_ERROR: ${candidates.join(', ')} 조회 실패 — ${detail}`);
+    return { status: 'FAILED', failure: { reason: 'API_ERROR', detail } };
+  }
+
+  const detail = `${candidates.join(', ')} 모두 데이터가 없습니다.`;
+  console.error('[kobis] NO_DATA:', detail);
+  return { status: 'FAILED', failure: { reason: 'NO_DATA', detail } };
 }

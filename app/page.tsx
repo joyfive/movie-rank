@@ -1,10 +1,11 @@
 import AdSlot from '@/components/AdSlot';
 import Hero from '@/components/Hero';
 import Methodology from '@/components/Methodology';
-import MovieList from '@/components/MovieList';
+import BoxOfficeGallery from '@/components/BoxOfficeGallery';
 import SummaryStrip from '@/components/SummaryStrip';
 import { toIsoDate } from '@/lib/date';
-import { fetchLatestBoxOffice } from '@/lib/kobis';
+import { fetchPosters } from '@/lib/kmdb';
+import { fetchLatestBoxOffice, type BoxOfficeFailure } from '@/lib/kobis';
 import { COPY, SITE } from '@/lib/site';
 import type { RankedMovie } from '@/types/movie';
 
@@ -29,25 +30,49 @@ function itemListJsonLd(movies: RankedMovie[], targetDate: string) {
   };
 }
 
-function BoxOfficeError() {
+/**
+ * Production 에서는 PRD 문구만 노출한다.
+ * 원인은 서버 로그에 남고, 개발 환경에서만 화면에도 함께 보여준다.
+ */
+function BoxOfficeError({ failure }: { failure: BoxOfficeFailure }) {
+  const showDetail = process.env.NODE_ENV !== 'production';
+
   return (
-    <section className="px-4 py-16 text-center">
-      <h1 className="text-xl font-bold text-fg">{COPY.heroTitle}</h1>
+    <section className="gutter py-16 text-center">
+      <h1 className="font-display text-2xl text-fg">{COPY.heroTitle}</h1>
       <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-fg-muted">
         {COPY.boxOfficeError}
       </p>
+
+      {showDetail ? (
+        <p className="mx-auto mt-6 max-w-md rounded-card border border-dashed border-border bg-surface-muted px-4 py-3 text-left text-xs leading-relaxed text-fg-subtle">
+          <span className="font-bold">[개발 전용] {failure.reason}</span>
+          <br />
+          {failure.detail}
+        </p>
+      ) : null}
     </section>
   );
 }
 
 export default async function HomePage() {
-  const snapshot = await fetchLatestBoxOffice();
+  const result = await fetchLatestBoxOffice();
 
-  if (!snapshot) {
-    return <BoxOfficeError />;
+  if (result.status === 'FAILED') {
+    return <BoxOfficeError failure={result.failure} />;
   }
 
-  const { targetDate, movies } = snapshot;
+  const { targetDate, movies } = result.snapshot;
+
+  // 포스터는 목록에 노출되므로 SSR 시점에 함께 조회한다.
+  // NEXT_PUBLIC_POSTER_ENABLED=false 이면 KMDb 를 호출하지 않고 빈 객체를 받는다.
+  const posters = await fetchPosters(
+    movies.map((movie) => ({
+      movieCode: movie.movieCode,
+      title: movie.title,
+      openDate: movie.openDate,
+    })),
+  );
 
   return (
     <>
@@ -60,11 +85,21 @@ export default async function HomePage() {
       <Hero targetDate={targetDate} />
       <SummaryStrip movies={movies} />
 
-      <div className="py-4">
+      <div className="py-4 lg:py-6">
         <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_A} label="광고 영역 A" minHeight={100} />
       </div>
 
-      <MovieList movies={movies} />
+      <BoxOfficeGallery
+        movies={movies}
+        posters={posters}
+        adSlot={
+          <AdSlot
+            slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_B}
+            label="광고 영역 B"
+            minHeight={250}
+          />
+        }
+      />
       <Methodology />
     </>
   );

@@ -17,9 +17,9 @@ export default function AdSlot({ slotId, label, minHeight = 100 }: AdSlotProps) 
   const enabled = FLAGS.adsenseEnabled && FLAGS.adsenseClient && slotId;
 
   return (
-    <div className="px-4" aria-label={label} role="complementary">
+    <div className="gutter" aria-label={label} role="complementary">
       <div
-        className="flex items-center justify-center overflow-hidden rounded-card border border-dashed border-border bg-surface-muted"
+        className="flex items-center justify-center overflow-hidden rounded-card border border-dashed border-border bg-surface-2"
         style={{ minHeight }}
       >
         {enabled ? (
@@ -32,7 +32,7 @@ export default function AdSlot({ slotId, label, minHeight = 100 }: AdSlotProps) 
             data-full-width-responsive="true"
           />
         ) : (
-          <span className="text-xs text-fg-subtle">광고 영역</span>
+          <span className="text-[0.7rem] tracking-widest text-fg-subtle uppercase">Ad</span>
         )}
       </div>
     </div>

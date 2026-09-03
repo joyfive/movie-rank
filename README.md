@@ -20,6 +20,38 @@
 | Hosting | Netlify |
 | DB | 없음 |
 
+## 디자인
+
+라이트 테마 고정(`color-scheme: light`). **포스터 갤러리에서 한 편을 고르면 위쪽 스테이지가 바뀌는** 구조다.
+동일한 상세 카드를 10번 반복하지 않는다.
+
+```
+Hero → Summary → Ad A → [스테이지: 선택된 1편] → 레일 1–5위 → Ad B → 레일 6–10위 → Methodology
+```
+
+- 갤러리는 `role="tablist"`, 스테이지는 `role="tabpanel"`. 좌우 방향키·Home·End 로 이동한다.
+- 스테이지 10개를 모두 렌더하고 선택되지 않은 것은 `hidden` 으로 둔다.
+  검색봇이 JavaScript 없이도 TOP 10 의 영화명과 지표를 읽어야 하기 때문이다(PRD 30).
+- 시각 장치: 순위 고스트 숫자, 포스터에 겹쳐 뜨는 원형 흥행 온도 뱃지,
+  선택된 포스터를 받치는 레드 블록.
+- **PC 는 폭을 제한하지 않고 화면을 다 쓴다.** 공통 좌우 여백은 `.gutter` 유틸리티가
+  320 / 640 / 1024 / 1536px 단계로 넓힌다.
+- 스테이지는 `grid-template-areas` 로만 재배치한다. 모바일은 `[포스터 | 제목]` 아래로 통계가
+  흐르고, PC 는 포스터가 왼쪽 열을 차지하고 제목·통계·버튼이 오른쪽에 쌓인다. DOM 은 하나다.
+- 레일은 모바일에서 레일 안에서만 가로 스크롤하고, PC 에서는 5열 그리드로 폭을 채운다.
+  페이지는 320px~1920px 어디서도 가로 스크롤이 없다.
+
+| 항목 | 값 |
+|---|---|
+| 타이틀 | 양진체 (Yangjin) — 단일 weight, `.font-display` |
+| 본문 | SUIT — 300 / 400 / 600 |
+| 액센트 | `#e50914` (채움) / `#ff4b55` (텍스트) |
+| 상태색 | 상승 레드 · 하락 블루 · 신규 골드 · 유지 그레이 (기호 병기) |
+
+폰트는 `app/globals.css` 의 `@font-face` 에서 jsDelivr CDN 으로 불러오며 `font-display: swap` 이다.
+색·간격·라운드는 모두 같은 파일의 `@theme` 토큰에 있으므로 스킨 변경은 이 블록만 수정하면 된다.
+양진체는 weight 가 하나뿐이라 합성 bold 가 붙지 않도록 `.font-display` 에서 `font-weight: normal` 을 강제한다.
+
 ## 시작하기
 
 ```bash
@@ -101,6 +133,23 @@ MovieCard → [정보 보기] → /api/movie-detail → KMDb → MovieDetail
 
 `netlify.toml` 에 `@netlify/plugin-nextjs` 가 설정되어 있다.
 Netlify 사이트의 Environment variables 에 위 환경변수를 등록한 뒤 배포한다.
+
+## 트러블슈팅
+
+### 화면에 "현재 박스오피스 정보를 불러오지 못했습니다" 만 보인다
+
+KOBIS 조회가 D-1 ~ D-3 모두 실패했을 때의 정상 동작이다. 원인은 서버 로그의 `[kobis]` 라인에 남는다.
+
+| 로그 | 원인 | 조치 |
+|---|---|---|
+| `[kobis] MISSING_API_KEY` | `KOBIS_API_KEY` 미설정 | 배포 환경변수에 키 등록 후 **재배포** |
+| `[kobis] KOBIS 오류 (...): 잘못된 키값입니다.` | 키가 틀림 | KOBIS 발급 키 확인 |
+| `[kobis] KOBIS 요청 실패 / HTTP 5xx` | KOBIS 장애 또는 아웃바운드 차단 | KOBIS 상태 및 호스팅 네트워크 확인 |
+| `[kobis] NO_DATA` | D-1~D-3 데이터가 모두 비어 있음 | KOBIS 데이터 갱신 대기 |
+
+- 로컬은 `.env.local`, 배포는 호스팅 대시보드의 Environment variables 에 키를 넣는다. `.env.local` 은 커밋되지 않으므로 **배포 환경에는 따로 등록해야 한다.**
+- 환경변수는 빌드 시점에 주입되므로 값을 추가한 뒤에는 재배포가 필요하다.
+- 개발 환경(`npm run dev`)에서는 오류 화면에 원인(`MISSING_API_KEY` 등)이 함께 표시된다. Production 에서는 노출되지 않는다.
 
 ## 라이선스 / Production Gate
 

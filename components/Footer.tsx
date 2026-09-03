@@ -3,10 +3,11 @@ import { SITE } from '@/lib/site';
 
 export default function Footer() {
   return (
-    <footer className="mt-4 border-t border-border bg-surface">
-      <div className="mx-auto max-w-content px-4 py-8 text-xs leading-relaxed text-fg-subtle">
-        <p className="font-semibold text-fg-muted">
-          {SITE.wordmark} {SITE.wordmarkKo}
+    <footer className="mt-6 border-t border-border bg-surface">
+      <div className="gutter py-8 text-xs leading-relaxed text-fg-subtle">
+        <p className="font-display text-base text-accent-text">
+          {SITE.wordmark}{' '}
+          <span className="text-xs text-fg-subtle">{SITE.wordmarkKo}</span>
         </p>
 
         <p className="mt-2">
@@ -21,14 +22,14 @@ export default function Footer() {
         </p>
 
         <nav className="mt-4 flex gap-4" aria-label="footer">
-          <Link href="/privacy" className="underline underline-offset-2 hover:text-fg">
+          <Link href="/privacy" className="underline underline-offset-2 transition-colors hover:text-accent-text">
             개인정보처리방침
           </Link>
           <a
             href="https://www.kobis.or.kr"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline underline-offset-2 hover:text-fg"
+            className="underline underline-offset-2 transition-colors hover:text-accent-text"
           >
             KOBIS
           </a>
@@ -36,7 +37,7 @@ export default function Footer() {
             href="https://www.kmdb.or.kr"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline underline-offset-2 hover:text-fg"
+            className="underline underline-offset-2 transition-colors hover:text-accent-text"
           >
             KMDb
           </a>
