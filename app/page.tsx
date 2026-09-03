@@ -1,7 +1,7 @@
 import AdSlot from '@/components/AdSlot';
 import Hero from '@/components/Hero';
 import Methodology from '@/components/Methodology';
-import MovieList from '@/components/MovieList';
+import BoxOfficeGallery from '@/components/BoxOfficeGallery';
 import SummaryStrip from '@/components/SummaryStrip';
 import { toIsoDate } from '@/lib/date';
 import { fetchPosters } from '@/lib/kmdb';
@@ -89,7 +89,17 @@ export default async function HomePage() {
         <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_A} label="광고 영역 A" minHeight={100} />
       </div>
 
-      <MovieList movies={movies} posters={posters} />
+      <BoxOfficeGallery
+        movies={movies}
+        posters={posters}
+        adSlot={
+          <AdSlot
+            slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_B}
+            label="광고 영역 B"
+            minHeight={250}
+          />
+        }
+      />
       <Methodology />
     </>
   );
