@@ -17,7 +17,7 @@ import type { RankedMovie } from '@/types/movie';
  */
 function Row({ label, value, srValue }: { label: string; value: string; srValue?: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-border/70 py-1.5 lg:flex-col lg:items-start lg:gap-1 lg:border-b-0 lg:border-l lg:border-border lg:py-0 lg:pl-3">
+    <div className="flex items-baseline justify-between gap-3 border-b border-border/70 py-1.5 lg:flex-col lg:items-start lg:justify-start lg:gap-1 lg:border-b-0 lg:border-l lg:border-border lg:py-0 lg:pl-3">
       <dt className="shrink-0 text-fg-subtle lg:text-xs">{label}</dt>
       <dd className="tabular min-w-0 text-right font-semibold text-fg lg:text-left lg:text-lg">
         {value}
@@ -60,11 +60,11 @@ export default function MovieStage({
 
   return (
     <div role="tabpanel" id={panelId} aria-labelledby={tabId} hidden={hidden}>
-      <div className="stage relative">
+      <div className="stage relative rounded-card border border-border bg-surface p-4 sm:p-6">
         {/* 순위를 고스트 숫자로 크게 깐다. 포스터와 텍스트가 그 위에 얹힌다. */}
         <span
           aria-hidden="true"
-          className="font-display tabular pointer-events-none absolute right-0 bottom-2 z-0 text-[6.5rem] leading-[0.8] text-surface-muted select-none sm:text-[10rem] lg:top-0 lg:bottom-auto lg:text-[16rem]"
+          className="font-display tabular pointer-events-none absolute right-3 bottom-3 z-0 text-[5.5rem] leading-[0.8] text-surface-2 select-none sm:text-[8rem] lg:top-4 lg:bottom-auto lg:text-[13rem]"
         >
           {String(movie.rank).padStart(2, '0')}
         </span>
