@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fetchMovieDetail, KmdbError, toMovieDetail } from '@/lib/kmdb';
+import { clearPosterCache, fetchMovieDetail, fetchPosters, KmdbError, toMovieDetail } from '@/lib/kmdb';
 import type { KmdbResultItem } from '@/types/kmdb';
 
 const item = (overrides: Partial<KmdbResultItem> = {}): KmdbResultItem => ({
@@ -151,5 +151,107 @@ describe('fetchMovieDetail', () => {
   it('API key 가 없으면 KmdbError', async () => {
     delete process.env.KMDB_API_KEY;
     await expect(fetchMovieDetail('파묘', null)).rejects.toBeInstanceOf(KmdbError);
+  });
+});
+
+describe('fetchPosters', () => {
+  const targets = [
+    { movieCode: 'M1', title: '파묘', openDate: '2024-02-22' },
+    { movieCode: 'M2', title: '서울의 봄', openDate: '2023-11-22' },
+  ];
+
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_POSTER_ENABLED = 'true';
+    clearPosterCache();
+  });
+
+  it('포스터가 OFF 면 KMDb 를 전혀 호출하지 않는다', async () => {
+    process.env.NEXT_PUBLIC_POSTER_ENABLED = 'false';
+
+    await expect(fetchPosters(targets)).resolves.toEqual({});
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('API key 가 없으면 호출하지 않는다', async () => {
+    delete process.env.KMDB_API_KEY;
+
+    await expect(fetchPosters(targets)).resolves.toEqual({});
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('movieCode → 포스터 URL 로 매핑한다', async () => {
+    fetchMock.mockImplementation(async (url: URL) => {
+      const title = url.searchParams.get('title') ?? '';
+      const isSeoul = title.includes('서울');
+      return jsonResponse([
+        item({
+          title,
+          prodYear: isSeoul ? '2023' : '2024',
+          repRlsDate: isSeoul ? '20231122' : '20240222',
+          posters: `https://example.com/${isSeoul ? 'seoul' : 'pamyo'}.jpg`,
+        }),
+      ]);
+    });
+
+    await expect(fetchPosters(targets)).resolves.toEqual({
+      M1: 'https://example.com/pamyo.jpg',
+      M2: 'https://example.com/seoul.jpg',
+    });
+  });
+
+  it('http 포스터 URL 은 https 로 올린다 (mixed content 방지)', async () => {
+    fetchMock.mockImplementation(async () =>
+      jsonResponse([item({ posters: 'http://file.koreafilm.or.kr/thm/a.jpg' })]),
+    );
+
+    const posters = await fetchPosters([targets[0]]);
+    expect(posters.M1).toBe('https://file.koreafilm.or.kr/thm/a.jpg');
+  });
+
+  it('매칭에 실패한 영화는 포스터를 붙이지 않는다', async () => {
+    // 동명 영화 2건 → AMBIGUOUS
+    fetchMock.mockImplementation(async () =>
+      jsonResponse([item({ repRlsDate: '20240222' }), item({ repRlsDate: '20240901' })]),
+    );
+
+    await expect(fetchPosters([targets[0]])).resolves.toEqual({});
+  });
+
+  it('한 편이 실패해도 나머지 포스터는 그대로 노출된다', async () => {
+    fetchMock.mockImplementation(async (url: URL) => {
+      if ((url.searchParams.get('title') ?? '').includes('서울')) {
+        throw new Error('KMDb down');
+      }
+      return jsonResponse([item({ posters: 'https://example.com/pamyo.jpg' })]);
+    });
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(fetchPosters(targets)).resolves.toEqual({
+      M1: 'https://example.com/pamyo.jpg',
+    });
+  });
+
+  it('같은 영화를 다시 조회하면 캐시를 사용한다', async () => {
+    fetchMock.mockImplementation(async () =>
+      jsonResponse([item({ posters: 'https://example.com/pamyo.jpg' })]),
+    );
+
+    await fetchPosters([targets[0]]);
+    const callsAfterFirst = fetchMock.mock.calls.length;
+
+    await fetchPosters([targets[0]]);
+
+    expect(fetchMock.mock.calls.length).toBe(callsAfterFirst);
+  });
+
+  it('매칭 실패(포스터 없음)도 캐시해 재조회하지 않는다', async () => {
+    fetchMock.mockImplementation(async () => jsonResponse([]));
+
+    await fetchPosters([targets[0]]);
+    const callsAfterFirst = fetchMock.mock.calls.length;
+
+    await fetchPosters([targets[0]]);
+
+    expect(fetchMock.mock.calls.length).toBe(callsAfterFirst);
   });
 });

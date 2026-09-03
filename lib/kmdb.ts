@@ -49,8 +49,10 @@ function pickPoster(item: KmdbResultItem): string | null {
 
   const first = (item.posters ?? '').split('|').map((url) => url.trim()).find(Boolean);
   if (!first) return null;
+  if (!/^https?:\/\//i.test(first)) return null;
 
-  return first.startsWith('http') ? first : null;
+  // KMDb 는 http 로 내려주는 경우가 있다. HTTPS 페이지에서 mixed content 로 차단되지 않도록 올린다.
+  return first.replace(/^http:\/\//i, 'https://');
 }
 
 function splitNames(values: Array<string | undefined>): string[] {
@@ -148,4 +150,109 @@ export async function fetchMovieDetail(
   }
 
   return { status: 'OK', detail: toMovieDetail(outcome.item) };
+}
+
+
+/* ---------------------------------------------------------------------------
+ * 포스터 선조회
+ *
+ * PRD 14 는 TOP 10 KMDb 선조회를 금지하지만, 목록에 포스터를 노출하기 위해
+ * 이 결정을 뒤집는다. 대신 다음으로 원래 목적(초기 속도·호출량·오류 격리)을 지킨다.
+ *   - 짧은 TTL 의 서버 메모리 캐시로 호출량을 억제한다 (영구 저장은 하지 않는다)
+ *   - 10건을 병렬로 조회하고 개별 실패는 해당 영화의 포스터만 없앤다
+ *   - 매칭 검증(제목 exact match + 개봉연도 ±1년)은 상세정보와 동일하게 적용한다
+ * ------------------------------------------------------------------------ */
+
+const POSTER_CACHE_TTL_MS = 30 * 60 * 1000;
+const POSTER_CACHE_MAX_ENTRIES = 200;
+
+interface PosterCacheEntry {
+  url: string | null;
+  expiresAt: number;
+}
+
+const posterCache = new Map<string, PosterCacheEntry>();
+
+function posterCacheKey(title: string, openDate: string | null): string {
+  return `${title}|${openDate ?? ''}`;
+}
+
+function readPosterCache(key: string): PosterCacheEntry | null {
+  const entry = posterCache.get(key);
+  if (!entry) return null;
+
+  if (entry.expiresAt <= Date.now()) {
+    posterCache.delete(key);
+    return null;
+  }
+  return entry;
+}
+
+function writePosterCache(key: string, url: string | null): void {
+  // 가장 오래된 항목부터 버린다. 영구 저장이 아니라 호출량 억제용이다.
+  if (posterCache.size >= POSTER_CACHE_MAX_ENTRIES) {
+    const oldest = posterCache.keys().next();
+    if (!oldest.done) posterCache.delete(oldest.value);
+  }
+  posterCache.set(key, { url, expiresAt: Date.now() + POSTER_CACHE_TTL_MS });
+}
+
+/** 테스트용. 캐시를 비운다. */
+export function clearPosterCache(): void {
+  posterCache.clear();
+}
+
+/**
+ * 영화 한 편의 포스터 URL. 매칭에 실패하면 null 을 반환한다.
+ * 잘못된 영화의 포스터를 붙이는 것보다 포스터가 없는 편이 낫다.
+ */
+async function fetchPosterUrl(title: string, openDate: string | null): Promise<string | null> {
+  const key = posterCacheKey(title, openDate);
+
+  const cached = readPosterCache(key);
+  if (cached) return cached.url;
+
+  const outcome = await fetchMovieDetail(title, openDate);
+  const url = outcome.status === 'OK' ? outcome.detail.posterUrl : null;
+
+  writePosterCache(key, url);
+  return url;
+}
+
+export interface PosterTarget {
+  movieCode: string;
+  title: string;
+  openDate: string | null;
+}
+
+/**
+ * TOP 10 의 포스터를 한 번에 조회한다.
+ * 포스터 기능이 꺼져 있으면 KMDb 를 전혀 호출하지 않는다.
+ *
+ * @returns movieCode → posterUrl. 실패한 영화는 포함되지 않는다.
+ */
+export async function fetchPosters(targets: PosterTarget[]): Promise<Record<string, string>> {
+  if (!posterEnabled() || !process.env.KMDB_API_KEY) return {};
+
+  const results = await Promise.allSettled(
+    targets.map(async (target) => ({
+      movieCode: target.movieCode,
+      url: await fetchPosterUrl(target.title, target.openDate),
+    })),
+  );
+
+  const posters: Record<string, string> = {};
+
+  for (const [index, result] of results.entries()) {
+    if (result.status === 'rejected') {
+      // KMDb 장애는 해당 영화의 포스터에만 영향을 준다. 순위 영역은 그대로 노출된다.
+      console.error(`[kmdb] 포스터 조회 실패 (${targets[index]?.title}):`, result.reason);
+      continue;
+    }
+    if (result.value.url) {
+      posters[result.value.movieCode] = result.value.url;
+    }
+  }
+
+  return posters;
 }

@@ -4,6 +4,7 @@ import Methodology from '@/components/Methodology';
 import MovieList from '@/components/MovieList';
 import SummaryStrip from '@/components/SummaryStrip';
 import { toIsoDate } from '@/lib/date';
+import { fetchPosters } from '@/lib/kmdb';
 import { fetchLatestBoxOffice, type BoxOfficeFailure } from '@/lib/kobis';
 import { COPY, SITE } from '@/lib/site';
 import type { RankedMovie } from '@/types/movie';
@@ -63,6 +64,16 @@ export default async function HomePage() {
 
   const { targetDate, movies } = result.snapshot;
 
+  // 포스터는 목록에 노출되므로 SSR 시점에 함께 조회한다.
+  // NEXT_PUBLIC_POSTER_ENABLED=false 이면 KMDb 를 호출하지 않고 빈 객체를 받는다.
+  const posters = await fetchPosters(
+    movies.map((movie) => ({
+      movieCode: movie.movieCode,
+      title: movie.title,
+      openDate: movie.openDate,
+    })),
+  );
+
   return (
     <>
       <script
@@ -78,7 +89,7 @@ export default async function HomePage() {
         <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_A} label="광고 영역 A" minHeight={100} />
       </div>
 
-      <MovieList movies={movies} />
+      <MovieList movies={movies} posters={posters} />
       <Methodology />
     </>
   );

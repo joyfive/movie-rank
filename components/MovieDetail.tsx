@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { track } from '@/lib/analytics';
-import { COPY, FLAGS } from '@/lib/site';
+import { COPY } from '@/lib/site';
 import type { MovieDetail as MovieDetailModel, MovieDetailResponse } from '@/types/kmdb';
 import type { RankedMovie } from '@/types/movie';
 
@@ -117,12 +117,12 @@ export default function MovieDetail({ movie }: { movie: RankedMovie }) {
         </div>
       ) : null}
 
-      {state.kind === 'ready' ? <DetailBody detail={state.detail} title={movie.title} /> : null}
+      {state.kind === 'ready' ? <DetailBody detail={state.detail} /> : null}
     </div>
   );
 }
 
-function DetailBody({ detail, title }: { detail: MovieDetailModel; title: string }) {
+function DetailBody({ detail }: { detail: MovieDetailModel }) {
   const hasAny =
     detail.genre.length > 0 ||
     detail.runtimeMinutes !== null ||
@@ -135,18 +135,9 @@ function DetailBody({ detail, title }: { detail: MovieDetailModel; title: string
     return <p className="py-2 text-fg-muted">{COPY.detailNotFound}</p>;
   }
 
+  // 포스터는 카드 상단(목록)에서 이미 노출하므로 여기서는 반복하지 않는다.
   return (
     <div className="flex gap-4">
-      {FLAGS.posterEnabled && detail.posterUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={detail.posterUrl}
-          alt={`${title} 포스터`}
-          className="h-auto w-20 shrink-0 rounded-md border border-border object-cover"
-          loading="lazy"
-        />
-      ) : null}
-
       <div className="min-w-0 flex-1">
         <dl>
           {detail.genre.length > 0 ? <Row label="장르" value={detail.genre.join(', ')} /> : null}

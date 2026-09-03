@@ -19,7 +19,7 @@ export default function AdSlot({ slotId, label, minHeight = 100 }: AdSlotProps) 
   return (
     <div className="px-4" aria-label={label} role="complementary">
       <div
-        className="flex items-center justify-center overflow-hidden rounded-card border border-dashed border-border bg-surface/50"
+        className="flex items-center justify-center overflow-hidden rounded-card border border-dashed border-border bg-surface-2"
         style={{ minHeight }}
       >
         {enabled ? (
