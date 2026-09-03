@@ -27,7 +27,7 @@ let fetchMock: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   process.env.KMDB_API_KEY = 'test-key';
-  process.env.NEXT_PUBLIC_POSTER_ENABLED = 'false';
+  process.env.POSTER_ENABLED = 'false';
   fetchMock = vi.fn();
   vi.stubGlobal('fetch', fetchMock);
 });
@@ -82,7 +82,7 @@ describe('toMovieDetail', () => {
   });
 
   it('포스터가 ON 이면 첫 번째 URL 을 사용한다', () => {
-    process.env.NEXT_PUBLIC_POSTER_ENABLED = 'true';
+    process.env.POSTER_ENABLED = 'true';
     expect(toMovieDetail(item()).posterUrl).toBe('https://example.com/a.jpg');
   });
 });
@@ -161,12 +161,12 @@ describe('fetchPosters', () => {
   ];
 
   beforeEach(() => {
-    process.env.NEXT_PUBLIC_POSTER_ENABLED = 'true';
+    process.env.POSTER_ENABLED = 'true';
     clearPosterCache();
   });
 
   it('포스터가 OFF 면 KMDb 를 전혀 호출하지 않는다', async () => {
-    process.env.NEXT_PUBLIC_POSTER_ENABLED = 'false';
+    process.env.POSTER_ENABLED = 'false';
 
     await expect(fetchPosters(targets)).resolves.toEqual({});
     expect(fetchMock).not.toHaveBeenCalled();

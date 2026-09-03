@@ -64,5 +64,4 @@ export const COPY = {
 export const FLAGS = {
   adsenseEnabled: process.env.NEXT_PUBLIC_ADSENSE_ENABLED === 'true',
   adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? '',
-  posterEnabled: process.env.NEXT_PUBLIC_POSTER_ENABLED === 'true',
 } as const;

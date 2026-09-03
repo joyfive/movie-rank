@@ -85,7 +85,7 @@ npm test           # Vitest
 | `NEXT_PUBLIC_ADSENSE_ENABLED` | `true` 일 때만 실제 광고 코드 렌더링 (기본 `false`) |
 | `NEXT_PUBLIC_ADSENSE_CLIENT` | AdSense `ca-pub-...` |
 | `NEXT_PUBLIC_ADSENSE_SLOT_A` / `_B` | 광고 슬롯 ID |
-| `NEXT_PUBLIC_POSTER_ENABLED` | `true` 일 때만 포스터 노출 (기본 `false`) |
+| `POSTER_ENABLED` | `true` 일 때만 포스터 노출 (기본 `false`). **server-only** — 접두사가 없어 재빌드 없이 반영된다 |
 | `NEXT_PUBLIC_GA_ID` | GA4 측정 ID (선택) |
 | `GOOGLE_SITE_VERIFICATION` | Search Console 소유 확인 (선택) |
 
@@ -158,7 +158,7 @@ KOBIS 조회가 D-1 ~ D-3 모두 실패했을 때의 정상 동작이다. 원인
 ```
 KOBIS 데이터 저장 금지
 NEXT_PUBLIC_ADSENSE_ENABLED=false
-NEXT_PUBLIC_POSTER_ENABLED=false
+POSTER_ENABLED=false
 ```
 
 - KOBIS 일별 박스오피스 API를 무료 웹서비스에서 실시간 조회해 보여주고 해당 페이지에 AdSense를 게재할 수 있는지 서면 확인
